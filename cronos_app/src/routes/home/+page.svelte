@@ -1,72 +1,89 @@
 <script>
-    // Variáveis reativas para armazenar o estado do formulário
-    let initialDate = '';
-    let endDate = '';
-    let hoursPerDay = 0;
-    
-    // Objeto reativo para os checkboxes
-    let daysChecked = {
-        seg: false,
-        ter: false,
-        quar: false,
-        qui: false,
-        sex: false,
-        sab: false,
-        dom: false
-    };
+	import { onMount } from 'svelte';
+	import flatpickr from 'flatpickr';
+	import 'flatpickr/dist/flatpickr.min.css';
 
-    // Variáveis para armazenar o resultado do cálculo
-    let totalDays = 0;
-    let totalHours = 0;
+	let initialDate = '';
+	let endDate = '';
+	let hoursPerDay = 0;
+	let daysChecked = {
+		seg: false,
+		ter: false,
+		quar: false,
+		qui: false,
+		sex: false,
+		sab: false,
+		dom: false
+	};
+	let totalDays = 0;
+	let totalHours = 0;
 
-    // Função que será chamada ao submeter o formulário
-    function calculateTotal() {
-        // As datas e horas são automaticamente sincronizadas pelas variáveis reativas
-        const start = new Date(initialDate);
-        const end = new Date(endDate);
-        
-        let days = 0;
-        let current = new Date(start);
-        
-        // Mapeamento dos dias da semana (índice 0 = Domingo, 1 = Segunda, ...)
-        const dayMap = {
-            dom: 0,
-            seg: 1,
-            ter: 2,
-            quar: 3,
-            qui: 4,
-            sex: 5,
-            sab: 6
-        };
+    let calendarInstance = null;
 
-        // Loop para contar os dias selecionados
-        while (current <= end) {
-            const dayOfWeek = current.getDay();
-            
-            for (const day in daysChecked) {
-                if (daysChecked[day] && dayMap[day] === dayOfWeek) {
-                    days++;
-                    break;
-                }
-            }
-            current.setDate(current.getDate() + 1);
-        }
+	const dayMap = {
+		dom: 0,
+		seg: 1,
+		ter: 2,
+		quar: 3,
+		qui: 4,
+		sex: 5,
+		sab: 6
+	};
 
-        // Atualiza as variáveis de resultado, que por sua vez atualizam a interface
-        totalDays = days;
-        totalHours = days * hoursPerDay;
-    }
+	function calculateTotal() {
+		const start = new Date(initialDate);
+		const end = new Date(endDate);
+
+		let days = 0;
+		let current = new Date(start);
+		let markedDates = [];
+
+		while (current <= end) {
+			const dayOfWeek = current.getDay();
+			for (const day in daysChecked) {
+				if (daysChecked[day] && dayMap[day] === dayOfWeek) {
+					days++;
+					markedDates.push(new Date(current));
+					break;
+				}
+			}
+			current.setDate(current.getDate() + 1);
+		}
+
+		totalDays = days;
+		totalHours = days * hoursPerDay;
+
+		// Atualiza o calendário com os dias marcados
+		if (calendarInstance) {
+			calendarInstance.setDate(markedDates, true);
+		}
+	}
+
+	onMount(() => {
+		calendarInstance = flatpickr("#meuCalendario", {
+			inline: true,
+			dateFormat: "d/m/Y",
+			mode: "multiple"
+		});
+	});
 </script>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
-
+     
+    .row-content{
+         display: flex;
+         align-items: center;
+    }
+    
+    .div-calendar {
+        margin-top: 100px;
+    }
     form {
         display: flex;
         flex-direction: column;
-        max-width: 600px;
+        max-width: 650px;
         height: 300px;
-        /* background-color: rgb(33, 179, 145); */
-        border: solid 1px rgb(212, 255, 0);
+        background-color: rgb(33, 179, 145);
         padding: 20px;
         padding-left: 50px;
         margin-left: -30px;
@@ -90,6 +107,7 @@
     }
     input{
         height: 40px;
+        width: 80%;
         border-radius: 15px;
         border: none;
         padding: 5px;
@@ -126,39 +144,73 @@
         font-weight: bold;
         color: rgb(39, 0, 63);
     }
+    .results {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 15px;
+        width: 300px;
+        text-align: center;
+        color: rgb(255, 255, 255);
+        background-color: rgb(33, 179, 145);
+        
+    }
+    .row-results {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-top: 20px;
+        width: 50%;
+    }
 </style>
 
 <div class="container">
-<h1>Bem vindo ao Cronos</h1>
-<p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
-
-<form on:submit|preventDefault={calculateTotal}>
-    <div class="row">
-        {#each Object.keys(daysChecked) as day}
-            <div class="col">
-                <label for={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
-                <input type="checkbox" id={day} name={day} bind:checked={daysChecked[day]}>
-            </div>
-        {/each}
-    </div>
-    
-    <label for="hours">Horas do dia contabilizadas</label>
-    <input type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
-    
-    <div class="row">
-        <label for="initial-date">Data inicial</label>
-        <input type="date" id="initial-date" name="initial-date" bind:value={initialDate}>
+    <div class="row-content">
+    <div>
+        <h1>Bem vindo ao Cronos</h1>
+        <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
+    <form on:submit|preventDefault={calculateTotal}>
+         
+        <div class="row">
+            {#each Object.keys(daysChecked) as day}
+                <div class="col">
+                    <label for={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+                    <input type="checkbox" id={day} name={day} bind:checked={daysChecked[day]}>
+                </div>
+            {/each}
+        </div>
         
-        <label for="end-date">Data final</label>
-        <input type="date" id="end-date" name="end-date" bind:value={endDate}>
+        
+        <div class="row">
+            <div class="col">
+                <label for="hours">Horas do dia contabilizadas</label>
+                <input type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
+            </div>
+            <div class="col">
+                <label for="initial-date">Data inicial</label>
+                <input type="date" id="initial-date" name="initial-date" bind:value={initialDate}>
+            </div>
+            <div class="col">
+                <label for="end-date">Data final</label>
+                <input type="date" id="end-date" name="end-date" bind:value={endDate}>
+            </div>
+        </div>
+        <div class="div-button">
+        <button type="submit">Calcular</button>
+        </div>
+    </form>
     </div>
-    <div class="div-button">
-    <button type="submit">Calcular</button>
+    <div class="div-calendar">
+        <div id="meuCalendario"></div>
+    </div>    
     </div>
-</form>
-
-{#if totalDays > 0}
-    <h3>Total de dias úteis: {totalDays} — Total de horas disponíveis: {totalHours}</h3>
-{/if}
+    <div class="row-results">
+        <div class="results">
+            <h3>Total de dias úteis: {totalDays}</h3>
+        </div>
+        <div class="results">
+            <h3>Total de horas disponíveis: {totalHours}</h3>
+        </div>
+    </div>
+        
 
 </div>
