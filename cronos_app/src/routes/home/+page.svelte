@@ -65,11 +65,15 @@
         flex-direction: column;
         max-width: 600px;
         height: 300px;
-        background-color: rgb(33, 179, 145);
+        /* background-color: rgb(33, 179, 145); */
+        border: solid 1px rgb(212, 255, 0);
         padding: 20px;
         padding-left: 50px;
         margin-left: -30px;
         border-radius: 15px;
+    }
+    form:hover {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     }
     .row {
         display: flex;
@@ -89,6 +93,12 @@
         border-radius: 15px;
         border: none;
         padding: 5px;
+        font-size: 16px;
+    }
+
+    input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
     }
     button {
         position: relative;
