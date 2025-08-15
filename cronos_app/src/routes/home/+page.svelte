@@ -69,15 +69,37 @@
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
-     
-    .row-content{
+     .container {
+        background-color: saddlebrown;
+        height: 100vh;
+        display: flex;
+
+    }
+    .left-side {
          display: flex;
+         flex-direction: column;
+         width: 50%;
          align-items: center;
+         background-color: blueviolet;
     }
+     .right-side {
+         display: flex;
+         flex-direction: column;
+         width: 50%;
+         align-items: center;
+         background-color: rgb(219, 181, 255);
+    }
+   .div-calendar {
+    background-color: rgb(37, 19, 139);
+    margin-top: 100px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1px));
+    gap: 20px;
+    width: 100%;
     
-    .div-calendar {
-        margin-top: 100px;
     }
+
+
     form {
         display: flex;
         flex-direction: column;
@@ -159,12 +181,12 @@
         justify-content: space-around;
         align-items: center;
         margin-top: 20px;
-        width: 50%;
-    }
+        width: 80%;
+        }
 </style>
 
 <div class="container">
-    <div class="row-content">
+    <div class="left-side">
     <div>
         <h1>Bem vindo ao Cronos</h1>
         <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
@@ -199,10 +221,6 @@
         </div>
     </form>
     </div>
-    <div class="div-calendar">
-        <div id="meuCalendario"></div>
-    </div>    
-    </div>
     <div class="row-results">
         <div class="results">
             <h3>Total de dias úteis: {totalDays}</h3>
@@ -211,6 +229,16 @@
             <h3>Total de horas disponíveis: {totalHours}</h3>
         </div>
     </div>
-        
+    </div>
+    <div class="right-side">    
+        <div class="div-calendar">
+            <div id="meuCalendario"></div>
+            <div id="meuCalendario"></div>
+            <div id="meuCalendario"></div>
+            <div id="meuCalendario"></div>
+
+
+    </div>
+    </div>
 
 </div>
