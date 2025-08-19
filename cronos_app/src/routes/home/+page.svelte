@@ -4,6 +4,7 @@
     import { Portuguese } from "flatpickr/dist/l10n/pt.js";
 	import 'flatpickr/dist/flatpickr.min.css';
     import { form } from '$app/server';
+    import html2canvas from "html2canvas";
 
 	let initialDate = '';
 	let endDate = '';
@@ -77,6 +78,18 @@
             allowInput: false
 		});
 	});
+    let meuConteudo; 
+    
+    function exportar() {
+    if (!meuConteudo) return;
+
+    html2canvas(meuConteudo).then(canvas => {
+      const link = document.createElement("a");
+      link.download = "relatorio.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
@@ -190,26 +203,7 @@
         font-weight: bold;
         color: rgb(39, 0, 63);
     }
-    .results {
-        margin-top: 20px;
-        padding: 10px;
-        border-radius: 15px;
-        width: 275px;
-        text-align: center;
-        color: rgb(255, 255, 255);
-        background-color: rgb(95, 74, 232);
-        font-weight: bold;
-        font-size: 20px;    
-    }
-
-    .row-results {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        align-items: center;
-        margin-top: 20px;
-        
-        }
+     
     .div-title {
         display: flex;
         flex-direction: row;
@@ -224,6 +218,17 @@
         width: 200px;
         height: 200px;
         margin-top: 20px;
+    }
+
+    table {
+        background-color: rgb(95, 74, 232);
+        border-radius: 15px;
+        width: 70%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+    table, th, td {
+        text-align: center;
     }
 </style>
 
@@ -266,17 +271,30 @@
         </div>
     </form>
     </div>
-    <div class="row-results">
+
+    <table bind:this={meuConteudo}>
+        <tbody>
+            <tr>
+                <td>Total de dias úteis</td>
+                <td>Total de horas disponíveis</td>
+            </tr>
+            <tr>
+                <td>{totalDays}</td>
+                <td>{totalHours}</td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- <div class="row-results">
         <div class="results">
             <span>Total de dias úteis: {totalDays}</span>
         </div>
         <div class="results">
             <span>Total de horas disponíveis: {totalHours}</span>
         </div>
-    </div>
+    </div> -->
     </div>
     <div class="right-side">    
-        <button class="bt-export" disabled> Exportar </button>
+        <button class="bt-export" id="btnExportar" on:click={exportar} disabled> Exportar </button>
         <div class="div-calendar">
                 <div id="meuCalendario"></div>
                 
