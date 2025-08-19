@@ -95,7 +95,7 @@
 <style>
    
      .container {
-        background-color: rgb(23, 6, 37);
+        background-color: rgb(47, 13, 75);
         height: 100vh;
         display: flex;
         color: whitesmoke;
@@ -140,12 +140,9 @@
     form {
         display: flex;
         flex-direction: column;
-        width: 100%;
-        height: 275px;
+        height: 65%;
         background-color: rgb(95, 74, 232);
-        padding: 20px;
-        padding-left: 50px;
-        margin-left: -30px;
+        padding: 50px;
         border-radius: 15px;
     }
     form:hover {
@@ -166,11 +163,12 @@
     }
     input[type="number"], input[type="date"] {
         height: 40px;
-        width: 80%;
+        width: 90%;
         border-radius: 15px;
         border: none;
         padding: 5px;
         font-size: 16px;
+        text-align: center;
     }
 
     input[type="checkbox"] {
@@ -197,6 +195,7 @@
         align-items: end;
         height: 30%;
         width: 100%;
+        margin-top: 60px;
     }
 
     label {
@@ -223,83 +222,96 @@
     table {
         background-color: rgb(95, 74, 232);
         border-radius: 15px;
-        width: 70%;
+        width: 100%;
         margin-top: 20px;
         border-collapse: collapse;
     }
     table, th, td {
         text-align: center;
     }
+
+    .left-content{
+        height: auto;
+        width: 75%;
+        height: 50%;
+    }
+    .input-hours{
+        text-align: center;
+    }
+
+    .title-prazo{
+        text-align: center;
+        height: 60px;
+        border-radius: 15px;
+        font-size: 20px;
+        border: none;
+        background-color: aliceblue;
+    }
+
 </style>
 
 <div class="container">
     <div class="left-side">
-    <div>
         <div class="div-title">
-        <h1>Bem vindo ao</h1><img src="Cronos-removebg-preview.png" alt="">
+            <h1>Bem vindo ao</h1><img src="Cronos-removebg-preview.png" alt="">
         </div>
-        <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
+    <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
     <!-- svelte-ignore component_name_lowercase -->
-    <form on:submit|preventDefault={calculateTotal}>
-         
-        <div class="row">
-            {#each Object.keys(daysChecked) as day}
+    <div class="left-content" bind:this={meuConteudo}>
+        <form on:submit|preventDefault={calculateTotal}>
+            <label for="title-prazo">Título do Prazo</label>
+            <input id="title-prazo" name="title-prazo" class="title-prazo" type="text" value="Prazo">
+            <div class="row">
+                {#each Object.keys(daysChecked) as day}
+                    <div class="col">
+                        <label for={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+                        <input type="checkbox" id={day} name={day} bind:checked={daysChecked[day]}>
+                    </div>
+                {/each}
+            </div>
+            
+            
+            <div class="row">
                 <div class="col">
-                    <label for={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
-                    <input type="checkbox" id={day} name={day} bind:checked={daysChecked[day]}>
+                    <label for="hours">Total de horas diárias</label>
+                    <input class="input-hours" type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
                 </div>
-            {/each}
-        </div>
+                <div class="col">
+                    <label for="initial-date">Data inicial</label>
+                    <input type="date" id="initial-date" name="initial-date" bind:value={initialDate}>
+                </div>
+                <div class="col">
+                    <label for="end-date">Data final</label>
+                    <input type="date" id="end-date" name="end-date" bind:value={endDate}>
+                </div>
+            </div> 
+            <div class="div-button">
+                <button type="submit">Calcular</button>
+            </div>
+        </form>
         
-        
-        <div class="row">
-            <div class="col">
-                <label for="hours">Total de horas diárias</label>
-                <input type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
-            </div>
-            <div class="col">
-                <label for="initial-date">Data inicial</label>
-                <input type="date" id="initial-date" name="initial-date" bind:value={initialDate}>
-            </div>
-            <div class="col">
-                <label for="end-date">Data final</label>
-                <input type="date" id="end-date" name="end-date" bind:value={endDate}>
-            </div>
-        </div>
-        <div class="div-button">
-        <button type="submit">Calcular</button>
-        </div>
-    </form>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Total de dias úteis</th>
+                    <th>Total de horas disponíveis</th>
+                </tr>
+                <tr>
+                    <td>{totalDays}</td>
+                    <td>{totalHours}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <table bind:this={meuConteudo}>
-        <tbody>
-            <tr>
-                <td>Total de dias úteis</td>
-                <td>Total de horas disponíveis</td>
-            </tr>
-            <tr>
-                <td>{totalDays}</td>
-                <td>{totalHours}</td>
-            </tr>
-        </tbody>
-    </table>
-    <!-- <div class="row-results">
-        <div class="results">
-            <span>Total de dias úteis: {totalDays}</span>
-        </div>
-        <div class="results">
-            <span>Total de horas disponíveis: {totalHours}</span>
-        </div>
-    </div> -->
-    </div>
+
+
+
+</div>
     <div class="right-side">    
         <button class="bt-export" id="btnExportar" on:click={exportar} disabled> Exportar </button>
         <div class="div-calendar">
                 <div id="meuCalendario"></div>
-                
-
         </div>
     </div>
-
 </div>
