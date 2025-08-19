@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+		<link rel="icon" href="/Cronos.png" />
 </svelte:head>
 
 {@render children?.()}

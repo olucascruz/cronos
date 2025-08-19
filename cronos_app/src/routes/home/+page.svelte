@@ -1,7 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
+    import { Portuguese } from "flatpickr/dist/l10n/pt.js";
 	import 'flatpickr/dist/flatpickr.min.css';
+    import { form } from '$app/server';
 
 	let initialDate = '';
 	let endDate = '';
@@ -43,7 +45,7 @@
 			for (const day in daysChecked) {
 				if (daysChecked[day] && dayMap[day] === dayOfWeek) {
 					days++;
-					markedDates.push(new Date(current));
+					markedDates.unshift(new Date(current));
 					break;
 				}
 			}
@@ -52,60 +54,82 @@
 
 		totalDays = days;
 		totalHours = days * hoursPerDay;
-
+        let monthsCount = (end.getFullYear() - start.getFullYear()) * 12 
+                + (end.getMonth() - start.getMonth()) + 1;
 		// Atualiza o calendário com os dias marcados
 		if (calendarInstance) {
 			calendarInstance.setDate(markedDates, true);
 		}
+        const exportButton = document.querySelector('.bt-export');
+        if (exportButton) {
+            exportButton.disabled = totalDays === 0 || totalHours === 0;
+        }
 	}
 
+    
 	onMount(() => {
 		calendarInstance = flatpickr("#meuCalendario", {
+            locale: Portuguese,
 			inline: true,
 			dateFormat: "d/m/Y",
-			mode: "multiple"
+            showMonths: 2,
+			mode: "multiple",
+            allowInput: false
 		});
 	});
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
+   
      .container {
-        background-color: saddlebrown;
+        background-color: rgb(23, 6, 37);
         height: 100vh;
         display: flex;
-
+        color: whitesmoke;
     }
     .left-side {
          display: flex;
          flex-direction: column;
          width: 50%;
          align-items: center;
-         background-color: blueviolet;
     }
      .right-side {
-         display: flex;
-         flex-direction: column;
-         width: 50%;
-         align-items: center;
-         background-color: rgb(219, 181, 255);
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 50%;
     }
-   .div-calendar {
-    background-color: rgb(37, 19, 139);
-    margin-top: 100px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1px));
-    gap: 20px;
+
+    .bt-export {
+        margin-top: 60px;
+        position: relative;
+        height: 50px;
+        width: 150px;
+        border-radius: 15px;
+        border: none;
+        background-color: rgb(255, 255, 255);
+        cursor: pointer;    
+        font-weight: bold;
+        bottom: 0;
+    }
+    .div-calendar {
+    display: flex;
+    margin-top: 145px;
+    justify-content: center;
+    flex-wrap: wrap;
     width: 100%;
-    
     }
 
-
+    .div-calendar  div {
+        margin: 0;
+        padding: 0;
+    }
     form {
         display: flex;
         flex-direction: column;
-        max-width: 650px;
-        height: 300px;
-        background-color: rgb(33, 179, 145);
+        width: 100%;
+        height: 275px;
+        background-color: rgb(95, 74, 232);
         padding: 20px;
         padding-left: 50px;
         margin-left: -30px;
@@ -127,7 +151,7 @@
     input, label, button {
         margin: 5px 0;
     }
-    input{
+    input[type="number"], input[type="date"] {
         height: 40px;
         width: 80%;
         border-radius: 15px;
@@ -170,26 +194,47 @@
         margin-top: 20px;
         padding: 10px;
         border-radius: 15px;
-        width: 300px;
+        width: 275px;
         text-align: center;
         color: rgb(255, 255, 255);
-        background-color: rgb(33, 179, 145);
-        
+        background-color: rgb(95, 74, 232);
+        font-weight: bold;
+        font-size: 20px;    
     }
+
     .row-results {
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
+        gap: 15px;
         align-items: center;
         margin-top: 20px;
-        width: 80%;
+        
         }
+    .div-title {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    .div-title > h1, .div-title > img {
+        margin-top: 0;
+    }
+
+    img{
+        width: 200px;
+        height: 200px;
+        margin-top: 20px;
+    }
 </style>
 
 <div class="container">
     <div class="left-side">
     <div>
-        <h1>Bem vindo ao Cronos</h1>
+        <div class="div-title">
+        <h1>Bem vindo ao</h1><img src="Cronos-removebg-preview.png" alt="">
+        </div>
         <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
+    <!-- svelte-ignore component_name_lowercase -->
     <form on:submit|preventDefault={calculateTotal}>
          
         <div class="row">
@@ -204,7 +249,7 @@
         
         <div class="row">
             <div class="col">
-                <label for="hours">Horas do dia contabilizadas</label>
+                <label for="hours">Total de horas diárias</label>
                 <input type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
             </div>
             <div class="col">
@@ -223,22 +268,20 @@
     </div>
     <div class="row-results">
         <div class="results">
-            <h3>Total de dias úteis: {totalDays}</h3>
+            <span>Total de dias úteis: {totalDays}</span>
         </div>
         <div class="results">
-            <h3>Total de horas disponíveis: {totalHours}</h3>
+            <span>Total de horas disponíveis: {totalHours}</span>
         </div>
     </div>
     </div>
     <div class="right-side">    
+        <button class="bt-export" disabled> Exportar </button>
         <div class="div-calendar">
-            <div id="meuCalendario"></div>
-            <div id="meuCalendario"></div>
-            <div id="meuCalendario"></div>
-            <div id="meuCalendario"></div>
+                <div id="meuCalendario"></div>
+                
 
-
-    </div>
+        </div>
     </div>
 
 </div>
