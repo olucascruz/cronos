@@ -18,9 +18,17 @@
 		sab: false,
 		dom: false
 	};
+
+
+    function getDays() {
+  // Filtra as chaves com valor true e junta em uma string
+    return Object.keys(daysChecked)
+        .filter(day => daysChecked[day])
+        .join(', ');
+    }
 	let totalDays = 0;
 	let totalHours = 0;
-
+    let titleTask = "Prazo";
     let calendarInstance = null;
 
 	const dayMap = {
@@ -55,8 +63,7 @@
 
 		totalDays = days;
 		totalHours = days * hoursPerDay;
-        let monthsCount = (end.getFullYear() - start.getFullYear()) * 12 
-                + (end.getMonth() - start.getMonth()) + 1;
+      
 		// Atualiza o calendário com os dias marcados
 		if (calendarInstance) {
 			calendarInstance.setDate(markedDates, true);
@@ -79,23 +86,26 @@
 		});
 	});
     let meuConteudo; 
-    
+    let showExport = false;    
     function exportar() {
     if (!meuConteudo) return;
 
+    showExport = true;
     html2canvas(meuConteudo).then(canvas => {
       const link = document.createElement("a");
       link.download = "relatorio.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
     });
+    setTimeout(()=>{
+        showExport = false;
+    }, 300)
   }
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
    
      .container {
-        background-color: rgb(47, 13, 75);
         height: 100vh;
         display: flex;
         color: whitesmoke;
@@ -104,17 +114,16 @@
          display: flex;
          flex-direction: column;
          width: 50%;
-         align-items: center;
+         align-items: flex-end;
     }
      .right-side {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         flex-direction: column;
         width: 50%;
     }
 
     .bt-export {
-        margin-top: 60px;
         position: relative;
         height: 50px;
         width: 150px;
@@ -127,7 +136,7 @@
     }
     .div-calendar {
     display: flex;
-    margin-top: 145px;
+    margin-top: 10px;
     justify-content: center;
     flex-wrap: wrap;
     width: 100%;
@@ -140,9 +149,10 @@
     form {
         display: flex;
         flex-direction: column;
-        height: 65%;
+        height: auto;
         background-color: rgb(95, 74, 232);
-        padding: 50px;
+        margin-top: 10px;
+        padding: 20px;
         border-radius: 15px;
     }
     form:hover {
@@ -195,12 +205,28 @@
         align-items: end;
         height: 30%;
         width: 100%;
-        margin-top: 60px;
+    }
+    
+    .div-button button{
+        background-color: rgb(190, 183, 245);
+        color: rgb(66, 15, 133);
+        cursor: pointer;
+        width: 200px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* sombra suave */
+        font-size: 16px;
+        
+
+
+
+    }
+
+    .div-button button:hover{
+        background-color: rgb(199, 192, 245);
     }
 
     label {
         font-weight: bold;
-        color: rgb(39, 0, 63);
+        color: rgb(255, 255, 255);
     }
      
     .div-title {
@@ -208,6 +234,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
+        color: aliceblue;
     }
     .div-title > h1, .div-title > img {
         margin-top: 0;
@@ -223,17 +250,23 @@
         background-color: rgb(95, 74, 232);
         border-radius: 15px;
         width: 100%;
-        margin-top: 20px;
+        margin-top: 10px;
+        height: 100px;
         border-collapse: collapse;
     }
     table, th, td {
         text-align: center;
+        font-size: 20px;
+        font-weight: bold;
     }
 
-    .left-content{
+    .content{
         height: auto;
-        width: 75%;
+        width: 618px;
         height: 50%;
+        margin-left: 50px;
+        margin-right: 50px;
+
     }
     .input-hours{
         text-align: center;
@@ -247,71 +280,116 @@
         border: none;
         background-color: aliceblue;
     }
+    .div-button-export{
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
 
+    }
+    .result-export{
+        background-color: rgb(95, 74, 232);
+        margin-top: -15px;
+        height: 320px;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        
+    }
+
+    
+    .result-export  p {
+        font-size: 18px;
+    }
+    
+    .result-content{
+        padding-left: 20px;
+        
+    }
 </style>
 
+<div class="div-title">
+    <h1>Bem vindo ao</h1><img src="Cronos-removebg-preview.png" alt="">
+</div>
 <div class="container">
     <div class="left-side">
-        <div class="div-title">
-            <h1>Bem vindo ao</h1><img src="Cronos-removebg-preview.png" alt="">
-        </div>
-    <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
-    <!-- svelte-ignore component_name_lowercase -->
-    <div class="left-content" bind:this={meuConteudo}>
-        <form on:submit|preventDefault={calculateTotal}>
-            <label for="title-prazo">Título do Prazo</label>
-            <input id="title-prazo" name="title-prazo" class="title-prazo" type="text" value="Prazo">
-            <div class="row">
-                {#each Object.keys(daysChecked) as day}
+        <!-- svelte-ignore component_name_lowercase -->
+        <div class="content">
+            <div class="div-button-export"> 
+                <button style="opacity:0;"></button>
+            </div>
+            <form on:submit|preventDefault={calculateTotal}>
+                <label for="title-prazo">Título da Atividade</label>
+                <input id="title-prazo" name="title-prazo" class="title-prazo" type="text" bind:value={titleTask}>
+                <p>Marque os dias úteis, as horas disponíveis e o prazo.</p>
+                <div class="row">
+                    {#each Object.keys(daysChecked) as day}
                     <div class="col">
                         <label for={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
                         <input type="checkbox" id={day} name={day} bind:checked={daysChecked[day]}>
+                        </div>
+                    {/each}
+                </div>
+                
+                
+                <div class="row">
+                    <div class="col">
+                        <label for="hours">Total de horas diárias</label>
+                        <input class="input-hours" type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
                     </div>
-                {/each}
-            </div>
-            
-            
-            <div class="row">
-                <div class="col">
-                    <label for="hours">Total de horas diárias</label>
-                    <input class="input-hours" type="number" id="hours" name="hours" placeholder="Enter number of hours" min="1" max="23" step="0.5" bind:value={hoursPerDay}>
+                    <div class="col">
+                        <label for="initial-date">Data inicial</label>
+                        <input type="date" id="initial-date" name="initial-date" bind:value={initialDate}>
+                    </div>
+                    <div class="col">
+                        <label for="end-date">Data final</label>
+                        <input type="date" id="end-date" name="end-date" bind:value={endDate}>
+                    </div>
+                </div> 
+                <div class="div-button">
+                    <button type="submit">Calcular</button>
                 </div>
-                <div class="col">
-                    <label for="initial-date">Data inicial</label>
-                    <input type="date" id="initial-date" name="initial-date" bind:value={initialDate}>
-                </div>
-                <div class="col">
-                    <label for="end-date">Data final</label>
-                    <input type="date" id="end-date" name="end-date" bind:value={endDate}>
-                </div>
-            </div> 
-            <div class="div-button">
-                <button type="submit">Calcular</button>
-            </div>
-        </form>
+            </form>
         
-        <table>
-            <tbody>
-                <tr>
-                    <th>Total de dias úteis</th>
-                    <th>Total de horas disponíveis</th>
-                </tr>
-                <tr>
-                    <td>{totalDays}</td>
-                    <td>{totalHours}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+           </div>
 
 
 
 
 </div>
-    <div class="right-side">    
-        <button class="bt-export" id="btnExportar" on:click={exportar} disabled> Exportar </button>
-        <div class="div-calendar">
-                <div id="meuCalendario"></div>
+    <div class="right-side">
+        <div class="content">
+            <div class="div-button-export">
+                <button class="bt-export" id="btnExportar" on:click={exportar} disabled> Exportar </button>
+            </div>
+            <div id="result" bind:this={meuConteudo}>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>Total de dias úteis</th>
+                            <th>Total de horas disponíveis</th>
+                        </tr>
+                        <tr>
+                            <td>{totalDays}</td>
+                            <td>{totalHours}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- {#if showExport} -->
+                <!-- <div class="result-export">
+                    <hr>
+                    <div class="div-title">
+                    <h3>{titleTask}</h3>
+                    </div>
+                    <div class="result-content">
+                    <p><strong>Dias da atividade:</strong> {getDays()}</p>
+                    <p><strong>Horas diárias:</strong> {hoursPerDay}</p>
+                    <p><strong>Prazo:</strong> {initialDate} - {endDate}</p>
+                    </div>
+                </div> -->
+            
+                <div class="div-calendar">
+                        <div id="meuCalendario"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
