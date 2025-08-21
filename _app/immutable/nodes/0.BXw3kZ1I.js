@@ -1,1 +1,0 @@
-import"../chunks/DsnmJJEf.js";import{p as i,c as m,h as c,f as d,s as f,a,b as h,d as l,n as u}from"../chunks/Hf5eGHtj.js";var v=l('<link rel="icon" href="/Cronos.png"/>');function k(o,r){i(r,!0);const e=!0;var n=m();c(s=>{var p=v();a(s,p)});var t=d(n);return f(t,()=>r.children??u),a(o,n),h({prerender:e})}export{k as component};
