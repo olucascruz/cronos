@@ -5,6 +5,7 @@
     onMount(() => {
         window.location.replace("/home")
     });
+    
 </script>
 
 
