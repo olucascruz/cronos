@@ -3,8 +3,6 @@
 	import flatpickr from 'flatpickr';
     import { Portuguese } from "flatpickr/dist/l10n/pt.js";
 	import 'flatpickr/dist/flatpickr.min.css';
-    import { form } from '$app/server';
-    import html2canvas from "html2canvas";
 
 	let initialDate = '';
 	let endDate = '';
@@ -21,10 +19,10 @@
 
 
     function getDays() {
-  // Filtra as chaves com valor true e junta em uma string
-    return Object.keys(daysChecked)
-        .filter(day => daysChecked[day])
-        .join(', ');
+        // Filtra as chaves com valor true e junta em uma string
+        return Object.keys(daysChecked)
+            .filter(day => daysChecked[day])
+            .join(', ');
     }
 	let totalDays = 0;
 	let totalHours = 0;
@@ -73,8 +71,7 @@
             exportButton.disabled = totalDays === 0 || totalHours === 0;
         }
 	}
-
-    
+   
 	onMount(() => {
 		calendarInstance = flatpickr("#meuCalendario", {
             locale: Portuguese,
@@ -86,21 +83,50 @@
 		});
 	});
     let meuConteudo; 
-    let showExport = false;    
     function exportar() {
-    if (!meuConteudo) return;
+            
+        const canvas = document.createElement("canvas");
+        canvas.width = 800;
+        canvas.height = 400;
+        const ctx = canvas.getContext("2d");
+        if(!ctx) {
+            console.error("Não foi possível obter o contexto do canvas.");
+            return;
+        }
+        // Fundo branco
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    showExport = true;
-    html2canvas(meuConteudo).then(canvas => {
-      const link = document.createElement("a");
-      link.download = "relatorio.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    });
-    setTimeout(()=>{
-        showExport = false;
-    }, 300)
-  }
+        // Texto principal (tabela simulada)
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 20px Arial";
+        ctx.fillText("Total de dias úteis: " + totalDays, 50, 50);
+        ctx.fillText("Total de horas disponíveis: " + totalHours +"h", 50, 90);
+
+        // Separador
+        ctx.beginPath();
+        ctx.moveTo(50, 110);
+        ctx.lineTo(750, 110);
+        ctx.strokeStyle = "#000";
+        ctx.stroke();
+
+        // Título da tarefa
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(titleTask, 50, 150);
+
+        // Conteúdo da tarefa
+        ctx.font = "16px Arial";
+        ctx.fillText("Dias da atividade: " + getDays(), 50, 180);
+        ctx.fillText("Horas diárias: " + hoursPerDay +"h", 50, 210);
+        ctx.fillText("Prazo: " + initialDate + " - " + endDate, 50, 240);
+
+        // Exporta para PNG
+        const link = document.createElement("a");
+        link.download = "relatorio.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    
+    }
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
@@ -160,7 +186,8 @@
     }
     .row {
         display: flex;
-        justify-content: space-between;
+        gap: 25px;
+        justify-content: center;
         align-items: center;
     }
     .col {
@@ -173,7 +200,7 @@
     }
     input[type="number"], input[type="date"] {
         height: 40px;
-        width: 90%;
+        width: 150px;
         border-radius: 15px;
         border: none;
         padding: 5px;
@@ -195,6 +222,7 @@
         font-weight: bold;
         bottom: 0;
         width: 150px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* sombra suave */
     }
     button:hover {
         background-color: rgb(200, 200, 200);
@@ -235,6 +263,7 @@
         justify-content: center;
         align-items: center;
         color: aliceblue;
+        margin-top: -50px;
     }
     .div-title > h1, .div-title > img {
         margin-top: 0;
@@ -244,6 +273,7 @@
         width: 200px;
         height: 200px;
         margin-top: 20px;
+        margin-left: -20px;
     }
 
     table {
