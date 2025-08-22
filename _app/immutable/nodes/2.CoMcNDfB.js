@@ -1,1 +1,0 @@
-import"../chunks/DsnmJJEf.js";import{i as p}from"../chunks/CzChtDj0.js";import{o as a}from"../chunks/UkNxOktu.js";import{p as i,a as n}from"../chunks/zXcICulr.js";function f(r,o){i(o,!1),a(()=>{window.location.href="/home"}),p(),n()}export{f as component};
