@@ -1,1 +1,0 @@
-import"../chunks/DsnmJJEf.js";import{i as n}from"../chunks/CzChtDj0.js";import{o as p}from"../chunks/UkNxOktu.js";import{p as r,a}from"../chunks/zXcICulr.js";function f(i,o){r(o,!1),p(()=>{window.location.href="/cronos/home"}),n(),a()}export{f as component};
